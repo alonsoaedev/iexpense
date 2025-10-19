@@ -7,21 +7,43 @@
 
 import SwiftUI
 
-struct User: Codable {
-    let firstName: String
-    let lastName: String
+struct ExpenseItem {
+    let name: String
+    let type: String
+    let amount: Double
+}
+
+@Observable
+class Expenses {
+    var items: [ExpenseItem] = []
 }
 
 struct ContentView: View {
-    @State private var user: User = User(firstName: "Taylor", lastName: "Swift")
+    @State private var expenses: Expenses = Expenses()
+    
+    func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
+    }
     
     var body: some View {
-        Button("Save User") {
-            let encoder = JSONEncoder()
-            if let encoded = try? encoder.encode(user) {
-                // With that kind of data is better to use Defaults like the line below
-                // instead of @AppStorage
-                UserDefaults.standard.set(encoded, forKey: "iexpense_user")
+        NavigationStack {
+            List {
+                ForEach(expenses.items, id: \.name) { item in
+                    Text(item.name)
+                }
+                .onDelete(perform: removeItems)
+            }
+            .navigationTitle("iExpense")
+            .toolbar {
+                Button("Add expense", systemImage: "plus") {
+                    expenses.items.append(
+                        ExpenseItem(
+                            name: "Test",
+                            type: "Personal",
+                            amount: 5
+                        )
+                    )
+                }
             }
         }
     }
