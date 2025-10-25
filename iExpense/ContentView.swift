@@ -21,6 +21,7 @@ class Expenses {
 
 struct ContentView: View {
     @State private var expenses: Expenses = Expenses()
+    @State private var showingAddExpense: Bool = false
     
     func removeItems(at offsets: IndexSet) {
         expenses.items.remove(atOffsets: offsets)
@@ -37,15 +38,12 @@ struct ContentView: View {
             .navigationTitle("iExpense")
             .toolbar {
                 Button("Add expense", systemImage: "plus") {
-                    expenses.items.append(
-                        ExpenseItem(
-                            name: "Test",
-                            type: "Personal",
-                            amount: 5
-                        )
-                    )
+                    showingAddExpense = true
                 }
             }
+        }
+        .sheet(isPresented: $showingAddExpense) {
+            AddView(expenses: expenses)
         }
     }
 }
