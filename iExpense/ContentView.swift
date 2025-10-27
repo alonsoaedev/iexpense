@@ -37,6 +37,36 @@ class Expenses {
     }
 }
 
+struct ExpenseItemView: View {
+    var item: ExpenseItem
+    
+    var color: Color {
+        if item.amount > 100 {
+            return .red
+        }
+        
+        if item.amount > 10 {
+            return .yellow
+        }
+        
+        return .green
+    }
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(item.name)
+                    .font(.headline)
+                Text(item.type)
+            }
+            
+            Spacer()
+            Text(item.amount, format: .currency(code: item.currency))
+                .foregroundStyle(color)
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var expenses: Expenses = Expenses()
     @State private var showingAddExpense: Bool = false
@@ -49,16 +79,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 ForEach(expenses.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
-                        }
-
-                        Spacer()
-                        Text(item.amount, format: .currency(code: item.currency))
-                    }
+                    ExpenseItemView(item: item)
                 }
                 .onDelete(perform: removeItems)
             }
