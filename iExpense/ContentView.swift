@@ -77,13 +77,31 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(expenses.items) { item in
-                    ExpenseItemView(item: item)
+            VStack(spacing: 0) {
+                List {
+                    Section("Personal") {
+                        ForEach(expenses.items) { item in
+                            if item.type == "Personal" {
+                                ExpenseItemView(item: item)
+                            }
+                        }
+                        .onDelete(perform: removeItems)
+                    }
                 }
-                .onDelete(perform: removeItems)
+                
+                List {
+                    Section("Business") {
+                        ForEach(expenses.items) { item in
+                            if item.type == "Business" {
+                                ExpenseItemView(item: item)
+                            }
+                        }
+                        .onDelete(perform: removeItems)
+                    }
+                }
             }
             .navigationTitle("iExpense")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 Button("Add expense", systemImage: "plus") {
                     showingAddExpense = true
