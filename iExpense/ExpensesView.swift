@@ -16,11 +16,9 @@ struct ExpensesView: View {
     
     var body: some View {
         List {
-            Section("Personal") {
+            Section(type) {
                 ForEach(expenses) { item in
-                    if item.type == type {
-                        ExpenseView(item: item)
-                    }
+                    ExpenseView(item: item)
                 }
                 .onDelete(perform: removeItems)
             }
@@ -29,7 +27,9 @@ struct ExpensesView: View {
     
     init(type: String, sortOrder: [SortDescriptor<Expense>]) {
         self.type = type
-        _expenses = Query(sort: sortOrder)
+        _expenses = type == "All"
+            ? Query(sort: sortOrder)
+            : Query(filter: #Predicate<Expense> { $0.type == type}, sort: sortOrder)
     }
     
     func removeItems(at offsets: IndexSet) {

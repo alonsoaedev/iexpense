@@ -11,17 +11,18 @@ import SwiftUI
 struct ContentView: View {
     @Query var expenses: [Expense]
     
+    @State private var expensesType: String = "All"
     @State private var sortOrder = [
         SortDescriptor(\Expense.amount),
         SortDescriptor(\Expense.name),
     ]
     
+    let types = ["All", "Personal", "Business"]
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                ExpensesView(type: "Personal", sortOrder: sortOrder)
-                
-                ExpensesView(type: "Business", sortOrder: sortOrder)
+                ExpensesView(type: expensesType, sortOrder: sortOrder)
             }
             .navigationTitle("iExpense")
             .navigationBarTitleDisplayMode(.inline)
@@ -43,6 +44,14 @@ struct ContentView: View {
                                 SortDescriptor(\Expense.name),
                                 SortDescriptor(\Expense.amount),
                             ])
+                    }
+                }
+                
+                Menu("Filter") {
+                    Picker("Filter", selection: $expensesType) {
+                        ForEach(types, id: \.self) { type in
+                            Text(type).tag(type)
+                        }
                     }
                 }
             }
