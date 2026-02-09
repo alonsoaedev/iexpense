@@ -9,45 +9,41 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.modelContext) var modelContext
     @Query var expenses: [Expense]
     
-    func removeItems(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(expenses[index])
-        }
-    }
+    @State private var sortOrder = [
+        SortDescriptor(\Expense.amount),
+        SortDescriptor(\Expense.name),
+    ]
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                List {
-                    Section("Personal") {
-                        ForEach(expenses) { item in
-                            if item.type == "Personal" {
-                                ExpenseView(item: item)
-                            }
-                        }
-                        .onDelete(perform: removeItems)
-                    }
-                }
+                ExpensesView(type: "Personal", sortOrder: sortOrder)
                 
-                List {
-                    Section("Business") {
-                        ForEach(expenses) { item in
-                            if item.type == "Business" {
-                                ExpenseView(item: item)
-                            }
-                        }
-                        .onDelete(perform: removeItems)
-                    }
-                }
+                ExpensesView(type: "Business", sortOrder: sortOrder)
             }
             .navigationTitle("iExpense")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 NavigationLink("Add expense") {
                     AddView()
+                }
+                
+                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("Sort", selection: $sortOrder) {
+                        Text("Sort by Amount")
+                            .tag([
+                                SortDescriptor(\Expense.amount),
+                                SortDescriptor(\Expense.name),
+                            ])
+                        
+                        Text("Sort by Name")
+                            .tag([
+                                SortDescriptor(\Expense.name),
+                                SortDescriptor(\Expense.amount),
+                            ])
+                    }
                 }
             }
         }
